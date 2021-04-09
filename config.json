@@ -1,0 +1,15 @@
+{
+    "entry": [
+        {
+            "title": "页面A",
+            "name": "page-a",
+            "src": "./src/pageA/index.jsx"
+        },
+        {
+            "title": "页面B",
+            "name": "page-b",
+            "src": "./src/pageB/index.jsx",
+            "template": "./public/new-index.html"
+        }
+    ]
+}
