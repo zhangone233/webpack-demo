@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const customConfig = require('../config.js');
@@ -56,10 +57,12 @@ const commonCssLoader = [
     {
         loader: 'postcss-loader', // 在 css 中类似 babel 的功能
         options: {
-            // plugins: (loader) => [
-            //     require('precss')(), // 囊括了许多插件来支持类似 Sass 的特性，比如 CSS 变量，套嵌，mixins 等。
-            //     require('autoprefixer')(), // 添加了浏览器私有前缀，它使用 Can I Use 上面的数据，需要在 package.json 中配置 browserslist。
-            // ],
+            postcssOptions: {
+                plugins: (loader) => [
+                    require('precss')(), // 囊括了许多插件来支持类似 Sass 的特性，比如 CSS 变量，套嵌，mixins 等。
+                    require('autoprefixer')(), // 添加了浏览器私有前缀，它使用 Can I Use 上面的数据，需要在 package.json 中配置 browserslist。
+                ],
+            },
         },
     },
 ];
@@ -142,13 +145,28 @@ module.exports = function (webpackEnv) {
                         'less-loader', // 解析 less 文件，类似的还有 sass-loader 和 postcss-loader
                     ],
                 },
+                // {
+                //     test: /\.s(a|c)ss$/,
+                //     exclude: /node_modules/,
+                //     use: [...commonCssLoader, 'sass-loader'],
+                // },
                 {
                     test: /\.s(a|c)ss$/,
                     exclude: /node_modules/,
                     use: [
-                        ...commonCssLoader,
-                        'sass-loader'
-                    ]
+                        {
+                            loader: MiniCssExtractPlugin.loader,
+                            options: {
+                                // // 只在开发模式启用热更新
+                                // hmr: isEnvDevelopment,
+                                // // 如果模块热更新不起作用，重新加载全部样式
+                                // reloadAll: true,
+                            },
+                        },
+                        'css-loader',
+                        'postcss-loader',
+                        'sass-loader',
+                    ],
                 },
                 {
                     test: /\.styl$/,
@@ -266,6 +284,27 @@ module.exports = function (webpackEnv) {
         },
         plugins: [
             // 插件配置
+
+            // 直接拷贝文件到指定目录
+            new CopyWebpackPlugin({
+                // from    定义要拷贝的源文件            from：__dirname+'/src/components'
+                // to      定义要拷贝到的目标文件夹       to: __dirname+'/dist'
+                // toType  file 或者 dir                可选，默认是文件
+                // force   强制覆盖前面的插件            可选，默认是文件
+                // context                            可选，默认base   context可用specific  context
+                // flatten  只拷贝指定的文件              可以用模糊匹配
+                // ignore  忽略拷贝指定的文件            可以模糊匹配
+
+                patterns: [
+                    {
+                        from: './assets/', // 复制 assets/ 下的所有文件
+                        //  to: './dist'  // 默认复制到 output.path 出口目录
+                    },
+                    // {
+                    //     // 复制除assets外、其他目录下的文件
+                    // }
+                ],
+            }),
 
             // 默认情况下：每次webpack重新构建后清空output.path目录下的所有文件。 ps：可配置
             new CleanWebpackPlugin(),

@@ -10,10 +10,10 @@ module.exports = merge(baseConfigFunc('production'), {
         minimize: true,
         minimizer: [
             new OptimizeCSSAssetsPlugin(), // css 压缩配置
-            new TerserPlugin({ // webpack5开启配置会报错？
+            new TerserPlugin({ // webpack5开启配置会报错？ loader版本
                 // js 文件压缩
                 // cache: true, // 启用文件缓存
-                // parallel: true, // 使用多进程并行运行和文件缓存来提高构建速度
+                parallel: true, // 使用多进程并行运行和文件缓存来提高构建速度
                 // sourceMap: true, // 开启 sourceMap  // 如果在生产环境中使用 source-maps，必须设置为 true
             }),
         ],
